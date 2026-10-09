@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>墨韵 MaaS · 你的贴身书法 AI 陪练</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230d6e7e'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23f6f1e7' font-family='serif'>墨</text></svg>">
+<style>
+  :root{
+    --paper:#f6f1e7; --paper2:#efe7d6; --ink:#26241f; --ink-soft:#5c564a;
+    --teal:#0d6e7e; --teal-d:#0a5663; --teal-l:#e3f1f2; --seal:#b5402f;
+    --line:#e0d6c1;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:"Noto Serif SC","Songti SC","SimSun",serif;background:var(--paper);color:var(--ink);line-height:1.8;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+  /* nav */
+  nav{position:sticky;top:0;background:rgba(246,241,231,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);z-index:9;}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .brand{font-size:22px;font-weight:700;color:var(--teal-d);letter-spacing:2px;}
+  .brand small{font-size:12px;color:var(--ink-soft);letter-spacing:1px;margin-left:8px;}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;margin-left:26px;font-size:15px;}
+  .nav-links a:hover{color:var(--teal);}
+  .nav-cta{background:var(--teal);color:#fff !important;padding:8px 18px;border-radius:20px;}
+  /* hero */
+  header{padding:80px 0 60px;text-align:center;}
+  .seal{display:inline-block;background:var(--seal);color:#fff;font-size:13px;padding:3px 12px;border-radius:4px;letter-spacing:3px;margin-bottom:22px;}
+  h1{font-size:44px;line-height:1.3;margin-bottom:20px;letter-spacing:2px;}
+  h1 .accent{color:var(--teal);}
+  .sub{font-size:18px;color:var(--ink-soft);max-width:640px;margin:0 auto 34px;}
+  .hero-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+  .btn{display:inline-block;padding:13px 30px;border-radius:26px;font-size:16px;text-decoration:none;cursor:pointer;border:none;}
+  .btn-primary{background:var(--teal);color:#fff;}
+  .btn-primary:hover{background:var(--teal-d);}
+  .btn-ghost{background:transparent;color:var(--teal);border:1.5px solid var(--teal);}
+  /* section */
+  section{padding:60px 0;}
+  .sec-tag{color:var(--teal);font-size:14px;letter-spacing:4px;margin-bottom:10px;}
+  h2{font-size:30px;margin-bottom:14px;letter-spacing:1px;}
+  .lead{color:var(--ink-soft);max-width:680px;margin-bottom:36px;}
+  /* features */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px;}
+  .card h3{font-size:19px;color:var(--teal-d);margin:12px 0 8px;}
+  .card p{font-size:15px;color:var(--ink-soft);}
+  .icon{width:44px;height:44px;border-radius:10px;background:var(--teal-l);display:flex;align-items:center;justify-content:center;}
+  /* users */
+  .users{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  .user{background:var(--paper2);border-radius:12px;padding:20px;text-align:center;}
+  .user b{display:block;font-size:16px;margin-bottom:6px;}
+  .user span{font-size:13px;color:var(--ink-soft);}
+  /* demo placeholder */
+  .demo{background:repeating-linear-gradient(45deg,var(--paper2),var(--paper2) 12px,#eaddc6 12px,#eaddc6 24px);border:2px dashed var(--teal);border-radius:16px;height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--teal-d);}
+  .demo .big{font-size:20px;margin-top:10px;}
+  /* form */
+  .form-box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:36px;max-width:640px;margin:0 auto;}
+  label{display:block;font-size:14px;margin:16px 0 6px;color:var(--ink-soft);}
+  input,select{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:8px;font-size:15px;background:var(--paper);}
+  input:focus,select:focus{outline:none;border-color:var(--teal);}
+  .submit{width:100%;margin-top:24px;background:var(--teal);color:#fff;font-size:16px;}
+  .note{font-size:12px;color:var(--ink-soft);margin-top:12px;text-align:center;}
+  .toast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:14px 26px;border-radius:30px;opacity:0;transition:.3s;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  footer{border-top:1px solid var(--line);padding:30px 0;text-align:center;color:var(--ink-soft);font-size:13px;}
+  @media(max-width:760px){
+    h1{font-size:32px;} .grid{grid-template-columns:1fr;} .users{grid-template-columns:repeat(2,1fr);}
+    .nav-links a:not(.nav-cta){display:none;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <div class="brand">墨韵 MaaS<small>书法 AI 陪练 · MVP</small></div>
+    <div class="nav-links">
+      <a href="#features">核心功能</a>
+      <a href="#users">适合谁</a>
+      <a href="#demo">产品演示</a>
+      <a href="#join" class="nav-cta">加入内测</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <span class="seal">早鸟内测中</span>
+    <h1>把 AI 变成你的<br><span class="accent">贴身书法陪练</span></h1>
+    <p class="sub">拍一张你写的字，AI 就告诉你这笔哪儿好、哪儿歪、下一笔怎么改——像有个书法老师，天天盯着你练，还不要钱。</p>
+    <div class="hero-actions">
+      <a href="#join" class="btn btn-primary">我要内测名额</a>
+      <a href="#features" class="btn btn-ghost">先看看能干啥</a>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-tag">CORE FEATURES</div>
+    <h2>它能帮你做什么</h2>
+    <p class="lead">不是又一个"书法百科"，而是一个真的陪你动笔、给你反馈的练习搭子。</p>
+    <div class="grid">
+      <div class="card">
+        <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0d6e7e" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        <h3>拍照评字</h3>
+        <p>上传一张你手写的照片，AI 指出笔画、结构、间架哪里不到位，告诉你怎么改。</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0d6e7e" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg></div>
+        <h3>例字示范</h3>
+        <p>选一个字，生成楷书、行书、钢笔等不同风格的示范，照着临，不用自己到处找帖。</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0d6e7e" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <h3>记住你的进步</h3>
+        <p>记录你练过的每个字和每次的问题，下周开课先读它——像我那个有记忆的本地 Agent 一样。</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0d6e7e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <h3>每日一字</h3>
+        <p>每天推一个适合你当前水平的字，配上一段 3 分钟的引导，打开就能练。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="users" style="background:var(--paper2);">
+  <div class="wrap">
+    <div class="sec-tag">WHO IS IT FOR</div>
+    <h2>这是给谁做的</h2>
+    <p class="lead">我自己就是个练字的人，先解决我身边这几类朋友的痛点。</p>
+    <div class="users">
+      <div class="user"><b>硬笔练字党</b><span>想把字写好看但没人点评的学生和上班族</span></div>
+      <div class="user"><b>书法初学者</b><span>买了帖却不知道临得对不对的人</span></div>
+      <div class="user"><b>陪孩子练字的家长</b><span>自己不会写，但想知道孩子练得咋样</span></div>
+      <div class="user"><b>练字打卡群</b><span>群里互相打卡，但缺一个统一的点评工具</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <div class="sec-tag">DEMO</div>
+    <h2>产品演示</h2>
+    <p class="lead">下方为界面演示占位区，真实截图将随开发进度替换。</p>
+    <div class="demo">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#0d6e7e" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <div class="big">产品界面截图占位区</div>
+      <div>（开发中 · 内测版界面截图即将替换此处）</div>
+    </div>
+  </div>
+</section>
+
+<section id="join" style="background:var(--teal-l);">
+  <div class="wrap">
+    <div class="sec-tag" style="color:var(--teal-d)">WAITLIST</div>
+    <h2>第一批内测，等你</h2>
+    <p class="lead">现在还在内测打磨阶段。留下你的联系方式，做出来第一时间叫你——前 50 名免费。</p>
+    <div class="form-box">
+      <form id="waitForm">
+        <label for="name">怎么称呼你</label>
+        <input id="name" type="text" placeholder="例如：亚轩" required>
+        <label for="contact">你的微信 / 邮箱</label>
+        <input id="contact" type="text" placeholder="方便我以后联系到你" required>
+        <label for="type">你更接近哪一类用户</label>
+        <select id="type">
+          <option>硬笔练字党</option>
+          <option>书法初学者</option>
+          <option>陪孩子练字的家长</option>
+          <option>练字打卡群组织者</option>
+        </select>
+        <button class="btn submit" type="submit">提交，蹲一个内测名额</button>
+        <div class="note">本页为 MVP 落地页：表单暂为占位收集，提交后由开发者手动记录，暂不连接数据库。</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    墨韵 MaaS · 李亚轩（Yx922418Yz）· C9 自驱项目 MVP · 本页为早期验证落地页
+  </div>
+</footer>
+
+<div class="toast" id="toast">已收到你的报名，内测开了第一时间通知你！</div>
+
+<script>
+  document.getElementById('waitForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 2600);
+    this.reset();
+  });
+</script>
+</body>
+</html>
